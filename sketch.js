@@ -37,11 +37,18 @@ function setup() {
   }
 
   //create the restart button, style it
-  restartButton = createButton("Restart");
+  let restartButton = createButton('↺ restart');
   restartButton.position(20, 20);
-  restartButton.style("padding", "10px 20px");
-  restartButton.style("font-size", "16px");
-  restartButton.mousePressed(reset);
+  restartButton.style('font-family', 'VT323, monospace');
+  restartButton.style('font-size', '22px');
+  restartButton.style('background', 'transparent');
+  restartButton.style('border', '1px solid rgba(0,0,0,0.3)');
+  restartButton.style('color', 'rgba(0,0,0,0.5)');
+  restartButton.style('padding', '6px 16px');
+  restartButton.style('cursor', 'pointer');
+  restartButton.style('letter-spacing', '2px');
+  restartButton.style('border-radius', '4px');
+  restartButton.mousePressed(resetSketch);
 
   //max 600 thoughts, duplicates every 2 seconds, chaos speed 0.005
   thoughtManager = new ThoughtManager(600, 2000, 0.005);
@@ -107,6 +114,10 @@ function drawInputText() {
     cursorVisible = !cursorVisible;
     cursorTimer = millis();
   }
+
+  fill(0, 80);
+  textSize(16);
+  text("Type one thought, watch it consume everything…", width / 2, height / 2 - 50);
 
   // Draw user input
   fill(0);
