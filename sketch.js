@@ -50,12 +50,12 @@ function setup() {
   restartButton.style('border-radius', '4px');
   restartButton.mousePressed(resetSketch);
 
-  //max 600 thoughts, duplicates every 2 seconds, chaos speed 0.005
-  thoughtManager = new ThoughtManager(600, 2000, 0.005);
+  //max 400 thoughts, duplicates every 2 seconds, chaos speed 0.005
+  thoughtManager = new ThoughtManager(400, 2000, 0.005);
 }
 
 //reset function
-function reset() {
+function resetSketch() {
   thoughtManager.thoughts = [];
   thoughtManager.lastDupTime = 0;
   thoughtManager.dupInterval = 2000;
@@ -149,17 +149,36 @@ function keyTyped() {
 function keyPressed() {
   if (keyCode === BACKSPACE) {
     userInput = userInput.substring(0, userInput.length - 1);
-  } else if (keyCode === ENTER && userInput !== "") {
-    thoughtManager.addThought(new Thought(userInput, width / 2, height / 2));
-    userInput = "";
-    typingActive = false;
-    cursorVisible = false;
+  } else if (keyCode === ENTER && userInput !== '') {
+  thoughtManager.addThought(new Thought(userInput, width / 2, height / 2));
+  generateThoughts(userInput);
+  userInput = '';
+  typingActive = false;
+  cursorVisible = false;
   }
 }
 
-// -------------------------
+async function generateThoughts(input) {
+  try {
+    const response = await fetch('http://localhost:3000/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input })
+    });
+
+    const data = await response.json();
+
+    data.thoughts.forEach((thought, i) => {
+      setTimeout(() => {
+        thoughtManager.addThought(new Thought(thought, width / 2, height / 2));
+      }, i * 400);
+    });
+  } catch (err) {
+    console.error('AI generation failed:', err);
+  }
+}
+
 // Thought Class
-// -------------------------
 class Thought {
   constructor(content, x, y) {
     this.content = content;
@@ -208,12 +227,12 @@ class Thought {
       this.speedX = constrain(this.speedX, -5, 5);
       this.speedY = constrain(this.speedY, -5, 5);
 
-      //glitch effect
+    }
+    //glitch effect
       if (chaosLevel > 0.7 && random() < 0.05) {
         this.x += random(-10, 10);
         this.y += random(-5, 5);
       }
-    }
   }
 
   display() {
