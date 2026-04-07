@@ -1,13 +1,13 @@
 // Overthinking Machine
 
-//variables
+// variables
 let userInput = "";
 let typingActive = true;
 let cursorVisible = true;
 let cursorTimer = 0;
 let cursorInterval = 500;
-let restartButton;
 let myFont;
+let showIntro = true;
 
 // Stars
 let stars = [];
@@ -26,7 +26,6 @@ function setup() {
   textSize(25);
   textFont(myFont);
 
-  // Initialize stars
   for (let i = 0; i < 200; i++) {
     stars.push({
       x: random(width),
@@ -36,12 +35,11 @@ function setup() {
     });
   }
 
-  //create the restart button, style it
   let restartButton = createButton('↺ restart');
   restartButton.position(20, 20);
   restartButton.style('font-family', 'VT323, monospace');
   restartButton.style('font-size', '22px');
-  restartButton.style('background', 'transparent');
+  restartButton.style('background', '#ffffff');
   restartButton.style('border', '1px solid rgba(0,0,0,0.3)');
   restartButton.style('color', 'rgba(0,0,0,0.5)');
   restartButton.style('padding', '6px 16px');
@@ -50,11 +48,9 @@ function setup() {
   restartButton.style('border-radius', '4px');
   restartButton.mousePressed(resetSketch);
 
-  //max 300 thoughts, duplicates every 2 seconds, chaos speed 0.005
   thoughtManager = new ThoughtManager(300, 2000, 0.005);
 }
 
-//reset function
 function resetSketch() {
   thoughtManager.thoughts = [];
   thoughtManager.lastDupTime = 0;
@@ -67,18 +63,46 @@ function resetSketch() {
 function draw() {
   drawGradient();
   drawStars();
-
-  // Draw and update thoughts
   thoughtManager.update();
   thoughtManager.display();
 
-  // Draw blinking cursor + input text
   if (typingActive) {
     drawInputText();
   }
+
+  if (showIntro) {
+    drawIntro();
+  }
 }
 
-//background gradient
+function drawIntro() {
+  fill(0, 0, 0, 180);
+  noStroke();
+  rect(0, 0, width, height);
+
+  fill(255);
+  textSize(38);
+  text("Overthinking Machine", width / 2, height / 2 - 120);
+
+  textSize(20);
+  fill(255, 255, 255, 200);
+  text("You will type one thought. It will grow.", width / 2, height / 2 - 60);
+  text("It will multiply. It will spiral into things", width / 2, height / 2 - 30);
+  text("you didn't mean to think.", width / 2, height / 2);
+  text("This is what your mind does...", width / 2, height / 2 + 40);
+  text("you just don't usually get to watch.", width / 2, height / 2 + 70);
+
+  textSize(16);
+  fill(255, 255, 255, 130);
+  text("click anywhere to begin", width / 2, height / 2 + 140);
+}
+
+function mousePressed() {
+  if (showIntro) {
+    showIntro = false;
+  }
+}
+
 function drawGradient() {
   noFill();
   let c1 = color(230 + sin(t) * 10, 240 + sin(t + 1) * 10, 255);
@@ -91,17 +115,13 @@ function drawGradient() {
   t += 0.08;
 }
 
-//stars
 function drawStars() {
   for (let s of stars) {
-    drawingContext.shadowBlur = 20; //glow
-    drawingContext.shadowColor = color(255, 255, 255, 180); //white glow
-
+    drawingContext.shadowBlur = 20;
+    drawingContext.shadowColor = color(255, 255, 255, 180);
     fill(255, 255);
     noStroke();
     ellipse(s.x, s.y, s.size);
-
-    // Move star upward
     s.y -= s.speed;
     if (s.y < 0) s.y = height;
   }
@@ -109,39 +129,32 @@ function drawStars() {
 }
 
 function drawInputText() {
-  // Toggle cursor
   if (millis() - cursorTimer > cursorInterval) {
     cursorVisible = !cursorVisible;
     cursorTimer = millis();
   }
 
   fill(0, 80);
-  textSize(20);
+  textSize(16);
   text("Type one thought, watch it consume everything…", width / 2, height / 2 - 50);
 
-  // Draw user input
   fill(0);
+  textSize(25);
   noStroke();
   text(userInput, width / 2, height / 2);
 
-  // Draw thin blinking cursor
   if (cursorVisible) {
     stroke(0);
     strokeWeight(2);
     let tw = textWidth(userInput);
-    line(
-      width / 2 + tw / 2 + 2,
-      height / 2 - 20,
-      width / 2 + tw / 2 + 2,
-      height / 2 + 20
-    );
+    line(width / 2 + tw / 2 + 2, height / 2 - 20,
+         width / 2 + tw / 2 + 2, height / 2 + 20);
     noStroke();
   }
 }
 
-// Capture key presses
 function keyTyped() {
-  if (keyCode !== ENTER && keyCode !== BACKSPACE) {
+  if (!showIntro && keyCode !== ENTER && keyCode !== BACKSPACE) {
     userInput += key;
   }
 }
@@ -150,11 +163,11 @@ function keyPressed() {
   if (keyCode === BACKSPACE) {
     userInput = userInput.substring(0, userInput.length - 1);
   } else if (keyCode === ENTER && userInput !== '') {
-  thoughtManager.addThought(new Thought(userInput, width / 2, height / 2));
-  generateThoughts(userInput);
-  userInput = '';
-  typingActive = false;
-  cursorVisible = false;
+    thoughtManager.addThought(new Thought(userInput, width / 2, height / 2));
+    generateThoughts(userInput);
+    userInput = '';
+    typingActive = false;
+    cursorVisible = false;
   }
 }
 
@@ -178,7 +191,6 @@ async function generateThoughts(input) {
   }
 }
 
-// Thought Class
 class Thought {
   constructor(content, x, y) {
     this.content = content;
@@ -189,16 +201,14 @@ class Thought {
     this.speedX = random(-2, 2);
     this.speedY = random(-2, 2);
 
-    // Rotation properties
     this.angle = 0;
     this.angleSpeed = random(-0.02, 0.02);
     this.rotationDelay = random(1000, 3000);
     this.creationTime = millis();
 
-    // Pulse properties
     this.pulseOffset = random(TWO_PI);
-    this.pulseSpeed = 0.05; // slower pulse
-    this.pulseAmount = 5; // max pixels to grow/shrink
+    this.pulseSpeed = 0.05;
+    this.pulseAmount = 5;
   }
 
   update(chaosLevel) {
@@ -207,32 +217,27 @@ class Thought {
     if (this.x < 0 || this.x > width) this.speedX *= -1;
     if (this.y < 0 || this.y > height) this.speedY *= -1;
 
-    // Start rotation after delay
     if (millis() - this.creationTime > this.rotationDelay) {
       this.angle += this.angleSpeed;
     }
 
-    // Pulse size, sin makes it grow and shrink
-    this.size =
-      this.baseSize +
+    this.size = this.baseSize +
       sin(frameCount * this.pulseSpeed + this.pulseOffset) * this.pulseAmount;
 
-    //mouse repulsion
     let dx = this.x - mouseX;
     let dy = this.y - mouseY;
     let d = sqrt(dx * dx + dy * dy);
-    if (d < 60) {
+    if (d < 60 && d > 0) {
       this.speedX += (dx / d) * 0.5;
       this.speedY += (dy / d) * 0.5;
       this.speedX = constrain(this.speedX, -5, 5);
       this.speedY = constrain(this.speedY, -5, 5);
-
     }
-    //glitch effect
-      if (chaosLevel > 0.7 && random() < 0.05) {
-        this.x += random(-10, 10);
-        this.y += random(-5, 5);
-      }
+
+    if (chaosLevel > 0.7 && random() < 0.05) {
+      this.x += random(-10, 10);
+      this.y += random(-5, 5);
+    }
   }
 
   display() {
@@ -266,12 +271,10 @@ class ThoughtManager {
   update() {
     let chaos = this.getChaosLevel();
 
-    // Update all thoughts
     for (let t of this.thoughts) {
       t.update(chaos);
     }
 
-    // Duplication logic only if under max capacity
     if (
       this.thoughts.length < this.maxThoughts &&
       millis() - this.lastDupTime > this.dupInterval &&
@@ -279,14 +282,12 @@ class ThoughtManager {
     ) {
       let current = this.thoughts.slice();
       for (let t of current) {
-        // Randomize position slightly for new duplicates
         let newThought = new Thought(
           t.content,
           t.x + random(-10, 10),
           t.y + random(-10, 10)
         );
-
-        newThought.speedX += random(-0.2, 0.2); // slight speed variation
+        newThought.speedX += random(-0.2, 0.2);
         newThought.speedY += random(-0.2, 0.2);
         this.thoughts.push(newThought);
       }
@@ -303,8 +304,3 @@ class ThoughtManager {
     }
   }
 }
-
-//api
-//reflection page maybe
-//preloaded prompts
-//change font/color/size when text is duplicated
