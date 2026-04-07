@@ -50,8 +50,8 @@ function setup() {
   restartButton.style('border-radius', '4px');
   restartButton.mousePressed(resetSketch);
 
-  //max 400 thoughts, duplicates every 2 seconds, chaos speed 0.005
-  thoughtManager = new ThoughtManager(200, 2000, 0.005);
+  //max 300 thoughts, duplicates every 2 seconds, chaos speed 0.005
+  thoughtManager = new ThoughtManager(300, 2000, 0.005);
 }
 
 //reset function
