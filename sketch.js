@@ -51,7 +51,7 @@ function setup() {
   restartButton.mousePressed(resetSketch);
 
   //max 400 thoughts, duplicates every 2 seconds, chaos speed 0.005
-  thoughtManager = new ThoughtManager(400, 2000, 0.005);
+  thoughtManager = new ThoughtManager(200, 2000, 0.005);
 }
 
 //reset function
