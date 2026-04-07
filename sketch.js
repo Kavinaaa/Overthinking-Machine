@@ -116,7 +116,7 @@ function drawInputText() {
   }
 
   fill(0, 80);
-  textSize(16);
+  textSize(20);
   text("Type one thought, watch it consume everything…", width / 2, height / 2 - 50);
 
   // Draw user input
