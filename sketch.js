@@ -173,7 +173,7 @@ function keyPressed() {
 
 async function generateThoughts(input) {
   try {
-    const response = await fetch('https://Overthinking-Machine.onrender.com/generate', {
+    const response = await fetch('https://overthinking-machine.onrender.com/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ input })
