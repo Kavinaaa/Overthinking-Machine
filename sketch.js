@@ -35,7 +35,7 @@ function setup() {
     });
   }
 
-  let restartButton = createButton('↺ restart');
+  let restartButton = createButton('↺');
   restartButton.position(20, 20);
   restartButton.style('font-family', 'VT323, monospace');
   restartButton.style('font-size', '22px');
